@@ -7,7 +7,7 @@
 class RollMessage extends eui.Component {
     public speed: number = 10;
     /** 一条消息存在的时间，单位s */
-    public delay: number = 60;
+    public delay: number = 10;
 
     /** 滚动组件 */
     private scroller: eui.Scroller;
@@ -19,6 +19,11 @@ class RollMessage extends eui.Component {
 
     private textQueue: Array<string>;
 
+    /** 是否需要文本滚动 */
+    private needRoll: boolean = false;
+    /** 是否需要自身推动帧事件 */
+    private updateSelf: boolean = true;
+
     public constructor() {
         super();
         this.skinName = "RollMessageSkin";
@@ -28,13 +33,13 @@ class RollMessage extends eui.Component {
     protected createChildren() {
         super.createChildren();
         this.viewport = this.scroller.viewport;
-        this.viewport.scrollH = -this.width;
+        // this.viewport.scrollH = -this.width;
     }
 
     /** 开始滚动
      * @param updateSelf：是否由自身update
      */
-    public start(updateSelf: boolean = true) {
+    public start() {
         if (this.textQueue.length > 0)
             this.text.text = this.textQueue.shift();
 
@@ -45,11 +50,9 @@ class RollMessage extends eui.Component {
         else
             this.timer.reset();
 
+        this.checkNeedRoll();
         this.timer.start();
 
-        if (updateSelf)
-            if (!this.hasEventListener(egret.Event.ENTER_FRAME))
-                this.addEventListener(egret.Event.ENTER_FRAME, this.update, this);
     }
 
 
@@ -67,6 +70,7 @@ class RollMessage extends eui.Component {
      * @param speed ：滚动的像素距离
      */
     public roll() {
+        if(!this.needRoll) return;
         this.viewport.scrollH += this.speed;
 
         if (this.isEnd())
@@ -89,12 +93,31 @@ class RollMessage extends eui.Component {
         this.textQueue = [];
     }
 
+    private checkNeedRoll()
+    {
+        if(this.text.width > this.width)
+        {
+            this.needRoll = true;
+            this.viewport.scrollH = -this.width;
+        }
+        else
+        {
+            this.needRoll = false;
+            this.viewport.scrollH = 0;
+        }
+
+        if (this.updateSelf && this.needRoll)
+            if (!this.hasEventListener(egret.Event.ENTER_FRAME))
+                this.addEventListener(egret.Event.ENTER_FRAME, this.update, this);
+    }
+
     /** 时间到，选择是需要隐藏还是需要显示下一条 */
     public timeup() {
         if (this.textQueue.length > 0) {
             this.text.text = this.textQueue.shift();
-            this.viewport.scrollH = -this.width;
             this.timer.reset();
+            this.checkNeedRoll();
+
             this.timer.start();
         }
         else {
