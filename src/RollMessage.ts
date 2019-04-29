@@ -31,7 +31,10 @@ class RollMessage extends eui.Component {
         this.viewport.scrollH = -this.width;
     }
 
-    public start() {
+    /** 开始滚动
+     * @param updateSelf：是否由自身update
+     */
+    public start(updateSelf: boolean = true) {
         if (this.textQueue.length > 0)
             this.text.text = this.textQueue.shift();
 
@@ -44,13 +47,11 @@ class RollMessage extends eui.Component {
 
         this.timer.start();
 
-        if (!this.hasEventListener(egret.Event.ENTER_FRAME))
-            this.addEventListener(egret.Event.ENTER_FRAME, this.update, this);
+        if (updateSelf)
+            if (!this.hasEventListener(egret.Event.ENTER_FRAME))
+                this.addEventListener(egret.Event.ENTER_FRAME, this.update, this);
     }
 
-    private update() {
-        this.roll();
-    }
 
     /** 添加信息进入文本队列 */
     public addMessage(message: string) {
@@ -65,11 +66,15 @@ class RollMessage extends eui.Component {
     /** 滚动一次固定像素的距离
      * @param speed ：滚动的像素距离
      */
-    private roll() {
+    public roll() {
         this.viewport.scrollH += this.speed;
 
         if (this.isEnd())
             this.viewport.scrollH = -this.width;
+    }
+
+    private update() {
+        this.roll();
     }
 
     private hide() {
