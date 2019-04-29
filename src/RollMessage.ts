@@ -88,8 +88,9 @@ class RollMessage extends eui.Component {
         this.timer.stop();
 
         if (!this.hasEventListener(egret.Event.ENTER_FRAME))
-            this.addEventListener(egret.Event.ENTER_FRAME, this.update, this);
+            this.removeEventListener(egret.Event.ENTER_FRAME, this.update, this);
 
+        this.text.text = "";
         this.textQueue = [];
     }
 
