@@ -63,7 +63,7 @@ class RollMessage extends eui.Component {
 
     /** 是否到底 */
     public isEnd(): boolean {
-        return (this.viewport.scrollH >= this.viewport.contentWidth ? true : false);
+        return (this.viewport.scrollH >= this.text.width ? true : false);
     }
 
     /** 滚动一次固定像素的距离
@@ -74,7 +74,7 @@ class RollMessage extends eui.Component {
         this.viewport.scrollH += this.speed;
 
         if (this.isEnd())
-            this.viewport.scrollH = -this.width;
+            this.viewport.scrollH = -this.scroller.width;
     }
 
     private update() {
@@ -96,10 +96,10 @@ class RollMessage extends eui.Component {
 
     private checkNeedRoll()
     {
-        if(this.text.width > this.width)
+        if(this.text.width > this.scroller.width)
         {
             this.needRoll = true;
-            this.viewport.scrollH = -this.width;
+            this.viewport.scrollH = -this.scroller.width;
         }
         else
         {
